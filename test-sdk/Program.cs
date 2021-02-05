@@ -1,4 +1,5 @@
 ﻿    using System;
+    using System.Threading.Tasks;
     using Couchbase;
     using Microsoft.Extensions.Logging;
     using NLog;
@@ -9,10 +10,9 @@
         class Program
         {
             [Obsolete]
-            public static async System.Threading.Tasks.Task Main(string[] args)
+            public static async Task Main(string[] args)
             {
                 Console.WriteLine("Hello World!");
-
 
                 ILoggerFactory loggerFactory = new LoggerFactory();
 
@@ -28,24 +28,26 @@
                 {
                     Logging = loggerFactory,
                     UserName = "Administrator",
-                    Password = "couchbase",
-                    ConnectionString = "http://localhost"
+                    Password = "YStv9AQU2rtHGUUr",
+                    ConnectionString = "couchbase://cb-dev.farmhub.falckrenewables.com"
                 };
 
+                var bucketName = "semantic";
+
                 var cluster = await Cluster.ConnectAsync(options);
-                var bucket = await cluster.BucketAsync("travel-sample");
+                var bucket = await cluster.BucketAsync(bucketName);
                 var collection = bucket.DefaultCollection();
 
                 var result = await cluster.QueryAsync<dynamic>(
-                    "SELECT t.* FROM `travel-sample` t WHERE t.type=$1",
-                    options => options.Parameter("landmark")
+                    $"SELECT t.* FROM `{bucketName}` t WHERE t.type=$1",
+                    options => options.Parameter("measure")
                 );
 
                 await foreach (var row in result)
                 {
                     // each row is an instance of the Query<T> call (e.g. dynamic or custom type)
-                    var name = row.name;        // "Hollywood Bowl"
-                    var address = row.address;      // "4 High Street, ME7 1BB"
+                    var name = row.area;                        // "TECH"
+                    var address = row.semanticArtifactKey;      // NVRTR
                     Console.WriteLine($"{name},{address}");
                 }
 
@@ -56,9 +58,6 @@
                 var returnVal = await collection.GetAsync("beer-sample-101");
 
                 Console.WriteLine(returnVal.ContentAs<string>());
-            
             }
         }
-
-
     }
