@@ -45,16 +45,20 @@ namespace test_sdk
                 {
                     var result = await cluster.QueryAsync<dynamic>(
                         $"SELECT t.* FROM `{bucketName}` t WHERE t.type=$1 LIMIT 10",
-                        options => options.Parameter("measure")
+                        ops => ops.Parameter("measure")
                     );
+
+                    Console.WriteLine("############ START PRINTING QUERY RESULT ############");
 
                     await foreach (var row in result)
                     {
                         // each row is an instance of the Query<T> call (e.g. dynamic or custom type)
-                        var name = row.createdBy;                        // "TECH"
-                        var address = row.updateDate;                    // NVRTR
+                        var name = row.createdBy;                        
+                        var address = row.updateDate;
                         Console.WriteLine($"{name},{address}");
                     }
+
+                    Console.WriteLine("############ END PRINTING QUERY RESULT ############");
 
                     Console.WriteLine(result.Rows.ToString());
                 
@@ -72,8 +76,6 @@ namespace test_sdk
                     Console.WriteLine();
                 }
             }
-
-            await Task.Delay(TimeSpan.FromSeconds(30));
         }
     }
 }
